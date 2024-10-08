@@ -25,7 +25,10 @@ compose:
 	@docker-compose up --build
 
 api-call-ocr:
-	@curl -F "image=@/path/to/image.png" http://localhost:5000/perform_ocr
+	@curl --request POST \
+  --url http://localhost:5001/perform_ocr \
+  --header 'content-type: multipart/form-data' \
+  --form image=@/Users/gabrielneil/Repos/ocr-pii-project/img.png
 
 api-call-pii:
 	@curl -X POST http://localhost:5001/start_filtering
