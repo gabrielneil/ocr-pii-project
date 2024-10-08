@@ -8,14 +8,14 @@ services:
       - "15672:15672"
 
   perform_ocr:
-    build: ./PerformOCR
+    build: PerformOCR
     ports:
       - "5000:5000"
     depends_on:
       - rabbitmq
 
   filter_pii:
-    build: ./FilterPII
+    build: FilterPII
     ports:
       - "5001:5001"
     depends_on:

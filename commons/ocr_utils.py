@@ -8,9 +8,8 @@ from commons.text_bounding_box import TextBoundingBox
 
 def detect_text(image: bytes) -> list[TextBoundingBox]:
     """Detects text in an image and returns a list of TextBoundingBox objects."""
-    # Convert bytes to an image
-
     try:
+        # Convert bytes to an image
         img = Image.open(io.BytesIO(image))
 
         # Run OCR using Tesseract
