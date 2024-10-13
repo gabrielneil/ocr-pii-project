@@ -14,15 +14,6 @@ class PerformOCRService:
     The PerformOCR class listens to a RabbitMQ queue for incoming image messages,
     decodes the image, runs OCR on it, and sends the detected bounding boxes to another queue for further processing.
 
-    Attributes
-    ----------
-    OCR_QUEUE : str
-        The name of the queue where the image messages are received.
-    FILTER_PII_QUEUE : str
-        The name of the queue where the processed bounding boxes are sent.
-    rabbitmq_client : RabbitMQClient
-        The client used to interact with RabbitMQ for consuming and publishing messages.
-
     """
 
     OCR_QUEUE = "ocr_queue"

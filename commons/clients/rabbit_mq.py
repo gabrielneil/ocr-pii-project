@@ -11,15 +11,6 @@ class RabbitMQClient:
     The RabbitMQClient establishes a connection to a RabbitMQ broker, declares a queue, and
     provides methods to consume and publish messages to/from that queue. It includes a retry
     mechanism to handle connection failures.
-
-    Attributes
-    ----------
-    connection : pika.BlockingConnection
-        The connection to RabbitMQ.
-    channel : pika.adapters.blocking_connection.BlockingChannel
-        The channel to interact with RabbitMQ queues.
-    _queue_id : str
-        The ID of the queue used for consuming or publishing messages.
     """
 
     def __init__(self, connection_parameters: str, queue_id: str = None):
