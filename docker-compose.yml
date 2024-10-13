@@ -15,8 +15,8 @@ services:
     build:
       context: .
       dockerfile: PerformOCR/Dockerfile
-    ports:
-      - "5003:5003"
+    deploy:
+      replicas: 3
     depends_on:
       - rabbitmq
     environment:
@@ -26,8 +26,8 @@ services:
     build:
       context: .
       dockerfile: FilterPII/Dockerfile
-    ports:
-      - "5001:5001"
+    deploy:
+      replicas: 3
     depends_on:
       - rabbitmq
       - redis
