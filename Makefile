@@ -24,11 +24,5 @@ lint-fix:
 compose:
 	@docker-compose up --build
 
-api-call-ocr:
-	@curl --request POST \
-  --url http://localhost:5001/perform_ocr \
-  --header 'content-type: multipart/form-data' \
-  --form image=@/Users/gabrielneil/Repos/ocr-pii-project/img.png
-
-api-call-pii:
-	@curl -X POST http://localhost:5001/start_filtering
+run-process:
+	@python -u submit_pii.py

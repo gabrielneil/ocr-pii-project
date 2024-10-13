@@ -3,11 +3,28 @@ import io
 import pytesseract
 from PIL import Image
 
-from commons.text_bounding_box import TextBoundingBox
+from commons.entities.text_bounding_box import TextBoundingBox
 
 
 def detect_text(image: bytes) -> list[TextBoundingBox]:
-    """Detects text in an image and returns a list of TextBoundingBox objects."""
+    """
+    Detects text in an image and returns a list of TextBoundingBox objects.
+
+    This function takes an image as a byte array, processes it using Tesseract OCR,
+    and returns a list of bounding boxes that contain the detected text, along with
+    their coordinates (left, right, top, bottom).
+
+    Parameters
+    ----------
+    image : bytes
+        A byte representation of an image file, typically the result of reading an image file in binary mode.
+
+    Returns
+    -------
+    list of TextBoundingBox
+        A list of `TextBoundingBox` objects, each representing a detected text element and its bounding box coordinates
+        within the image.
+    """
     try:
         # Convert bytes to an image
         img = Image.open(io.BytesIO(image))

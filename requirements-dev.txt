@@ -1,3 +1,5 @@
 black
 isort
 pylama
+pytest
+pytest-mock

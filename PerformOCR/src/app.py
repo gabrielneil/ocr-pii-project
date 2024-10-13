@@ -1,40 +1,96 @@
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
+import base64
+import json
+import os
 
-from commons.exceptions import format_exception
-from commons.message_queue import publish_message
-from commons.ocr_utils import detect_text
+from utils import detect_text
 
-app = FastAPI(
-    docs_url="/docs",
-    title="ocr-api",
-    description="This project was designed to run OCR process",
-    summary="OCR api to extract values from imgs.",
-    contact={
-        "name": "Gabriel Neil",
-        "email": "gabrielneil7@gmail.com",
-    },
-)
+from commons.clients.rabbit_mq import RabbitMQClient
 
 
-@app.post("/perform_ocr", status_code=status.HTTP_201_CREATED)
-async def perform_ocr(image: UploadFile = File(...)):
-    try:
-        image_data = await image.read()
+class PerformOCRService:
+    """
+    Perform OCR on images received via a message queue and publish the bounding boxes.
 
-        # Detect text in the image and get bounding boxes
-        bounding_boxes = detect_text(image_data)
+    The PerformOCR class listens to a RabbitMQ queue for incoming image messages,
+    decodes the image, runs OCR on it, and sends the detected bounding boxes to another queue for further processing.
 
-        # Serialize bounding boxes for message queue
-        bounding_boxes_json = [box.__dict__ for box in bounding_boxes]
-        # publish_message("filter_pii", bounding_boxes_json)
+    Attributes
+    ----------
+    OCR_QUEUE : str
+        The name of the queue where the image messages are received.
+    FILTER_PII_QUEUE : str
+        The name of the queue where the processed bounding boxes are sent.
+    rabbitmq_client : RabbitMQClient
+        The client used to interact with RabbitMQ for consuming and publishing messages.
 
-        return {"result": "OCR execution finished"}
+    """
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=format_exception(e))
+    OCR_QUEUE = "ocr_queue"
+    FILTER_PII_QUEUE = "filter_pii_queue"
+
+    def __init__(
+        self,
+        connection_params="localhost",
+    ):
+        """
+        Initializes the PerformOCR class with a RabbitMQ connection.
+
+        Parameters
+        ----------
+        connection_params : str, optional
+            The connection string to connect to RabbitMQ (default is "localhost").
+        """
+        self.rabbitmq_client = RabbitMQClient(
+            connection_params, self.OCR_QUEUE
+        )
+
+    def process_image_message(self, ch, method, properties, body):
+        """
+        Processes an incoming RabbitMQ message, decodes the image, runs OCR, and publishes bounding boxes.
+
+        This method decodes the base64-encoded image data received in the message, extracts text bounding boxes
+        using the `detect_text` function, and then publishes the results to the `FILTER_PII_QUEUE`.
+
+        Parameters
+        ----------
+        ch : object
+            The channel object provided by RabbitMQ when consuming messages.
+        method : object
+            The delivery method used by RabbitMQ for the message.
+        properties : object
+            The properties of the RabbitMQ message.
+        body : bytes
+            The body of the RabbitMQ message, which contains the image data in base64-encoded format.
+
+        """
+        try:
+            # Decode the message body
+            message = json.loads(body)
+            image_data = base64.b64decode(message["image_data"])
+
+            # Detect text in the image and get bounding boxes
+            bounding_boxes = detect_text(image_data)
+
+            # Serialize bounding boxes for the message queue
+            bounding_boxes_json = [box.__dict__ for box in bounding_boxes]
+            payload = {
+                "img_id": message.get("img_id"),
+                "bounding_boxes": bounding_boxes_json,
+            }
+
+            # Publish the results to the filter_pii_queue
+            self.rabbitmq_client.publish_message(
+                self.FILTER_PII_QUEUE, payload
+            )
+            print(
+                f"Processed image and sent bounding boxes to filter_pii_queue for img_id {message.get('img_id')}"
+            )
+
+        except Exception as e:
+            print(f"Error processing message: {e}")
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=5001)
+    connection_params = os.getenv("RABBITMQ_HOST", "rabbitmq")
+    ocr_service = PerformOCRService(connection_params)
+    ocr_service.rabbitmq_client.start(ocr_service.process_image_message)
