@@ -2,9 +2,8 @@ import base64
 import json
 import os
 
-from utils import detect_text
-
 from commons.clients.rabbit_mq import RabbitMQClient
+from PerformOCR.src.utils import detect_text
 
 
 class PerformOCRService:
@@ -13,15 +12,6 @@ class PerformOCRService:
 
     The PerformOCR class listens to a RabbitMQ queue for incoming image messages,
     decodes the image, runs OCR on it, and sends the detected bounding boxes to another queue for further processing.
-
-    Attributes
-    ----------
-    OCR_QUEUE : str
-        The name of the queue where the image messages are received.
-    FILTER_PII_QUEUE : str
-        The name of the queue where the processed bounding boxes are sent.
-    rabbitmq_client : RabbitMQClient
-        The client used to interact with RabbitMQ for consuming and publishing messages.
 
     """
 

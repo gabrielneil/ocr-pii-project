@@ -10,11 +10,6 @@ class RedisStorage:
     The RedisStorage class provides methods for storing, retrieving, and deleting data in a Redis instance.
     The data is stored under composite keys based on the job ID and data type.
 
-    Attributes
-    ----------
-    client : redis.Redis
-        The Redis client used for interacting with the Redis database.
-
     """
 
     def __init__(self, host="localhost", port=6379, db=0):
@@ -72,7 +67,6 @@ class RedisStorage:
         -------
         dict or None
             The data retrieved from Redis, deserialized from JSON format. If no data is found, `None` is returned.
-
         """
         redis_key = f"{key}:{data_type}"
         data_json = self.client.get(redis_key)

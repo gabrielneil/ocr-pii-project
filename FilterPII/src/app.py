@@ -13,16 +13,6 @@ class FilterPIIService:
     The FilterPIIService listens to a RabbitMQ queue for incoming messages containing bounding boxes or PII terms,
     processes them, and publishes filtered results to another queue after excluding any bounding boxes containing PII.
 
-    Attributes
-    ----------
-    FILTER_PII_QUEUE : str
-        The name of the queue from which the service consumes messages.
-    FILTERED_QUEUE : str
-        The name of the queue to which the filtered bounding boxes are published.
-    rabbitmq_client : RabbitMQClient
-        A RabbitMQ client used for consuming and publishing messages.
-    redis_storage : RedisStorage
-        A Redis client used for storing and retrieving bounding boxes and PII terms.
     """
 
     FILTER_PII_QUEUE = "filter_pii_queue"
@@ -165,9 +155,6 @@ class FilterPIIService:
         This method begins consuming messages from the `FILTER_PII_QUEUE` and processes them
         using the `_process_message` method.
 
-        Notes
-        -----
-        This method runs indefinitely, consuming and processing messages from the queue.
         """
         self.rabbitmq_client.start(self._process_message)
         print(
@@ -175,7 +162,6 @@ class FilterPIIService:
         )
 
 
-# Usage
 if __name__ == "__main__":
     connection_params = os.getenv("RABBITMQ_HOST", "rabbitmq")
     redis_host = os.getenv("REDIS_HOST", "redis")
