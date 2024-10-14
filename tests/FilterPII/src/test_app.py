@@ -3,21 +3,20 @@ from unittest import mock
 
 import pytest
 
-from commons.clients.rabbit_mq import RabbitMQClient
-from commons.clients.redis_storage import RedisStorage
 from FilterPII.src.app import FilterPIIService
 
 
 # Define fixture to mock RabbitMQClient
 @pytest.fixture
 def mock_rabbitmq(mocker):
-    return mocker.patch("commons.clients.rabbit_mq.RabbitMQClient")
+    # return mocker.patch("commons.clients.rabbit_mq.RabbitMQClient")
+    return mocker.patch("FilterPII.src.app.RabbitMQClient")
 
 
 # Define fixture to mock RedisStorage
 @pytest.fixture
 def mock_redis(mocker):
-    return mocker.patch("commons.clients.redis_storage.RedisStorage")
+    return mocker.patch("FilterPII.src.app.RedisStorage")
 
 
 # Test _filter_bounding_boxes method

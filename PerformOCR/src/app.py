@@ -2,9 +2,8 @@ import base64
 import json
 import os
 
-from utils import detect_text
-
 from commons.clients.rabbit_mq import RabbitMQClient
+from PerformOCR.src.utils import detect_text
 
 
 class PerformOCRService:

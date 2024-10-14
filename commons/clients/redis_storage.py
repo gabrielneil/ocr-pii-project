@@ -67,7 +67,6 @@ class RedisStorage:
         -------
         dict or None
             The data retrieved from Redis, deserialized from JSON format. If no data is found, `None` is returned.
-
         """
         redis_key = f"{key}:{data_type}"
         data_json = self.client.get(redis_key)

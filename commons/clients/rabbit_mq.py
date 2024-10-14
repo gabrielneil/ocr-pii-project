@@ -61,8 +61,6 @@ class RabbitMQClient:
         process_message : function
             A callback function to process each received message. The function should accept three arguments:
             `ch` (channel), `method`, and `body` (the message content).
-
-
         """
         self.channel.basic_consume(
             queue=self._queue_id,
